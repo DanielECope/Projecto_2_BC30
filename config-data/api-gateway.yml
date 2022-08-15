@@ -22,4 +22,5 @@ spring:
           uri: lb://microservicio-product
           predicates:
             - Path=/api/1.0.0/products/**
+            - Path=/api/1.0.0/producttypes/**
         
