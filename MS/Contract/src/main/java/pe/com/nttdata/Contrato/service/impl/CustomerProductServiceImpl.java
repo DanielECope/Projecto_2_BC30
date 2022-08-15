@@ -25,7 +25,7 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerProductServiceImpl.class);
 	private final WebClient webClientCustomer= WebClient.create("http://localhost:8081/api/1.0.0/customers");
 	private final WebClient webClientCustomerType= WebClient.create("http://localhost:8081/api/1.0.0/customertypes");
-	private final WebClient webClientProducts= WebClient.create("http://localhost:8081/api/1.0.0/products");
+	private final WebClient webClientProducts= WebClient.create("http://localhost:8084/api/1.0.0/products");
 
 	
 	@Autowired
