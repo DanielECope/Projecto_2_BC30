@@ -18,7 +18,7 @@ spring:
           enabled: true
       routes:            
         - id: microservicio-product
-          # lb(Load Banlacing) - MICROSERVICIO-BBVA (Nombre de la aplicación - se registró en EUREKA)
+          # lb(Load Banlacing) - MICROSERVICIO-PRODUCT(Nombre de la aplicación - se registró en EUREKA)
           uri: lb://microservicio-product
           predicates:
             - Path=/api/1.0.0/products/**
