@@ -4,7 +4,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/bd_bbva
+      uri: mongodb://localhost:27017/contract
       
 # Para conectar con el Eureka Server (Sevice Discovery)
 eureka:

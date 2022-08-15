@@ -26,3 +26,11 @@ spring:
           uri: lb://microservicio-customer
           predicates:
             - Path=/api/1.0.0/customers/**, /api/1.0.0/customertypes/**
+        - id: microservicio-contract
+          uri: lb://microservicio-contract
+          predicates:
+            - Path=/api/1.0.0/contracts/**
+        - id: microservicio-operation
+          uri: lb://microservicio-operation
+          predicates:
+            - Path=/api/1.0.0/operation/**

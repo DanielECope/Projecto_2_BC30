@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: microservicio-contract
+  cloud:
+    config:
+      uri: http://localhost:7075
+      username: root
+      password: s3cr3t0
