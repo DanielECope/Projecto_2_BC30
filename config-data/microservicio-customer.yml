@@ -1,0 +1,16 @@
+server:
+  port: 7071
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/bd_bbva
+      
+# Para conectar con el Eureka Server (Sevice Discovery)
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7076/eureka
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${random.uuid}

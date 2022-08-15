@@ -1,0 +1,8 @@
+server:
+  port: 7076
+
+# Para que el service discovery no se registre
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false

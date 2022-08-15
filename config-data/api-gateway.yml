@@ -1,0 +1,25 @@
+server:
+  port: 7070
+
+# Para conectar con el Eureka Server (Sevice Discovery)
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:7076/eureka
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${random.uuid}
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: microservicio-bbva
+          # lb(Load Banlacing) - MICROSERVICIO-BBVA (Nombre de la aplicación - se registró en EUREKA)
+          uri: lb://microservicio-bbva
+          predicates:
+            - Path=/api/1.0.0/operations/**
+            
