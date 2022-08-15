@@ -22,5 +22,9 @@ spring:
           uri: lb://microservicio-product
           predicates:
             - Path=/api/1.0.0/products/**
+        - id: microservicio-producttypes
+          # lb(Load Banlacing) - MICROSERVICIO-PRODUCT(Nombre de la aplicación - se registró en EUREKA)
+          uri: lb://microservicio-producttypes
+          predicates:
             - Path=/api/1.0.0/producttypes/**
         
