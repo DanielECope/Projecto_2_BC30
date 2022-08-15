@@ -4,8 +4,8 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/bd_bbva
-      searchPaths: config-data
+      uri: mongodb://localhost:27017/CustomerDB
+      
       
 # Para conectar con el Eureka Server (Sevice Discovery)
 eureka:
