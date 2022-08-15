@@ -42,7 +42,6 @@ public class OperationServiceImpl implements IOperationService {
 	public Mono<CustomerProduct> updateContract(CustomerProduct obj){
 		logger.info("Class: OperationServiceImpl -> Method: updateContract ");
 		return webClientContract.put().uri("/update",obj)
-				//.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON)
 				.body(BodyInserters.fromObject(obj))
 				.retrieve()

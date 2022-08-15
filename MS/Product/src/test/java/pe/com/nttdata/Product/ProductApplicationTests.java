@@ -1,10 +1,10 @@
-package pe.com.nttdata.Customer;
+package pe.com.nttdata.Product;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MantenedorApplicationTests {
+class ProductApplicationTests {
 
 	@Test
 	void contextLoads() {
