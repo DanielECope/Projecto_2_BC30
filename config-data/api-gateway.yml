@@ -22,4 +22,7 @@ spring:
           uri: lb://microservicio-product
           predicates:
             - Path=/api/1.0.0/products/**, /api/1.0.0/producttypes/**
-        
+        - id: microservicio-customer
+          uri: lb://microservicio-customer
+          predicates:
+            - Path=/api/1.0.0/customers/**, /api/1.0.0/customertypes/**
