@@ -16,10 +16,11 @@ spring:
       discovery:
         locator:
           enabled: true
-      routes:
-        - id: microservicio-bbva
+      routes:            
+        - id: microservicio-product
           # lb(Load Banlacing) - MICROSERVICIO-BBVA (Nombre de la aplicación - se registró en EUREKA)
-          uri: lb://microservicio-bbva
+          uri: lb://microservicio-product
           predicates:
-            - Path=/api/1.0.0/operations/**
-            
+            - Path=/api/1.0.0/products/**
+            - Path=/api/1.0.0/producttypes/**
+        
