@@ -24,9 +24,9 @@ import reactor.core.publisher.Mono;
 public class OperationServiceImpl implements IOperationService {
 	private static final Logger logger = LoggerFactory.getLogger(OperationServiceImpl.class);
 
-	private final WebClient webClientCustomer= WebClient.create("http://localhost:8081/api/1.0.0/customers");
-	private final WebClient webClientProducts= WebClient.create("http://localhost:8084/api/1.0.0/products");
-	private final WebClient webClientContract= WebClient.create("http://localhost:8082/api/1.0.0/contracts");
+	private final WebClient webClientCustomer= WebClient.create("http://localhost:7070/api/1.0.0/customers");
+	private final WebClient webClientProducts= WebClient.create("http://localhost:7070/api/1.0.0/products");
+	private final WebClient webClientContract= WebClient.create("http://localhost:7070/api/1.0.0/contracts");
 
 	@Autowired
 	private IOperationRepository repo;

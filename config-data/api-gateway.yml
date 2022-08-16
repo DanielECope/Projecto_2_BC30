@@ -30,3 +30,7 @@ spring:
           uri: lb://microservicio-contract
           predicates:
             - Path=/api/1.0.0/contracts/**
+        - id: microservicio-operation
+          uri: lb://microservicio-operation
+          predicates:
+            - Path=/api/1.0.0/operations/**
