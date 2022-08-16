@@ -2,6 +2,7 @@ package pe.com.nttdata.Operation.controller;
 
 import javax.validation.Valid;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@Slf4j
 @RequestMapping("api/1.0.0/operations")
 public class OperationController {
 	
@@ -36,7 +38,9 @@ public class OperationController {
 	public Mono<ResponseEntity<Flux<Operation>>> findByIdentificationDocumentAndProductId(
 			@PathVariable("identificationDocument") String identificationDocument,
 			@PathVariable("productId") String productId){
-		Flux<Operation> operations = service.findByIdentificationDocumentAndProductId(identificationDocument, productId); 
+		log.info("doc: "+identificationDocument);
+		log.info("producto: "+productId);
+		Flux<Operation> operations = service.findByIdentificationDocumentAndProductId(identificationDocument, productId);
 		return Mono.just(ResponseEntity.ok()
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(operations));
