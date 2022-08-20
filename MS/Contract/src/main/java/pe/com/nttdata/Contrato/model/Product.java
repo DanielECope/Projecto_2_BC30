@@ -22,4 +22,5 @@ public class Product {
 	@NotEmpty(message = "El campo productTypeId es requerido.")
 	private String productTypeId;
 	private ProductType productType;
+	private float commission;
 }

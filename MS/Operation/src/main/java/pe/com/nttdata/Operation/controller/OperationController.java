@@ -29,9 +29,11 @@ public class OperationController {
 	private IOperationService service;
 	
 	@PostMapping
-	public Mono<ResponseEntity<Mono<Operation>>> insert(@Valid @RequestBody Operation obj){
-		Mono<Operation> operation = service.insert(obj);
-		return Mono.just(new ResponseEntity<Mono<Operation>>(operation, HttpStatus.CREATED));
+	public Operation insert(@RequestBody Operation obj){
+		log.info("CLASS ::: OperationController - METHOD :::INSERT - PARAMS ::: "+obj.toString());
+		Operation operation = service.insert(obj);
+		//return Mono.just(new ResponseEntity<Mono<Operation>>(operation, HttpStatus.CREATED));
+		return operation;
 	}
 	
 	@GetMapping("/{identificationDocument}/{productId}")

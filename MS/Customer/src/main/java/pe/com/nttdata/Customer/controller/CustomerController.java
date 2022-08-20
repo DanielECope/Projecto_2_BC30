@@ -30,10 +30,10 @@ public class CustomerController {
 		return service.findById(id);
 	}
 
-	@GetMapping("/countAccountByDocument/{document}")
+	@GetMapping("/accountByDocument/{document}")
 	@ResponseStatus(code = HttpStatus.OK)
-	public Mono<Long> countAccountByDocument(@PathVariable("document") String document){
-		return service.findByIdentificationDocument(document).count();
+	public Flux<Customer> accountByDocument(@PathVariable("document") String document){
+		return service.findByIdentificationDocument(document);
 	}
 	
 	@PostMapping

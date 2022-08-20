@@ -30,6 +30,10 @@ public class Operation {
 	@Digits(integer = 10, fraction = 3, message = "El campo amount tiene un formato no válido (#####.000).")
 	@NotNull(message = "El campo amount es requerido.")
 	private BigDecimal amount;
-	
+	//proyecto 2
+	private String 	originAccount;
+	private String 	destinationAccount;
+	private String operationCustomerId;
+
 	private CustomerProduct customerProduct;
 }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.com.nttdata.Contrato.exception.BadRequestException;
 import pe.com.nttdata.Contrato.exception.ModelNotFoundException;
@@ -13,24 +14,36 @@ import pe.com.nttdata.Contrato.model.Customer;
 import pe.com.nttdata.Contrato.model.CustomerProduct;
 import pe.com.nttdata.Contrato.model.Product;
 import pe.com.nttdata.Contrato.repository.ICustomerProductRepository;
+import pe.com.nttdata.Contrato.repository.ICustomerProductRepositoryMongo;
 import pe.com.nttdata.Contrato.service.ICustomerProductService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 //feign client
 
 @Service
 public class CustomerProductServiceImpl implements ICustomerProductService {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerProductServiceImpl.class);
-	private final WebClient webClientCustomer= WebClient.create("http://localhost:7070/api/1.0.0/customers");
-	private final WebClient webClientCustomerType= WebClient.create("http://localhost:7070/api/1.0.0/customertypes");
-	private final WebClient webClientProducts= WebClient.create("http://localhost:7070/api/1.0.0/products");
+	private final WebClient webClientCustomer= WebClient.create("http://localhost:7071/api/1.0.0/customers");
+	//private final WebClient webClientCustomerType= WebClient.create("http://localhost:7071/api/1.0.0/customertypes");
+	private final WebClient webClientProducts= WebClient.create("http://localhost:7072/api/1.0.0/products");
 
 	
 	@Autowired
 	private ICustomerProductRepository repo;
+	@Autowired
+	private ICustomerProductRepositoryMongo repo2;
+	@Autowired
+	RestTemplate restTemplate;
 
+	@Autowired
+	public CustomerProductServiceImpl(RestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
+	}
 
 	public Mono<Customer> findByIdCustomer(String id){
 		logger.info("Class: CustomerProductServiceImpl -> Method: findByIdCustomer ");
@@ -39,12 +52,17 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 				.retrieve()
 				.bodyToMono(Customer.class);
 	}
-	public Mono<String> countCustomer(String document){
+	public Customer findByIdCustomer2(String id){
+		logger.info("Class: CustomerProductServiceImpl -> Method: findByIdCustomer "+"http://localhost:7071/api/1.0.0/customers/"+id);
+		Customer response = restTemplate.getForObject("http://localhost:7071/api/1.0.0/customers/"+id,Customer.class);
+		return  response;
+	}
+	public Flux<Customer> countCustomer(String document){
 		logger.info("Class: CustomerProductServiceImpl -> Method: findByIdCustomer ");
-		return webClientCustomer.get().uri("/countAccountByDocument/{document}",document)
+		return webClientCustomer.get().uri("/accountByDocument/{document}",document)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
-				.bodyToMono(String.class);
+				.bodyToFlux(Customer.class);
 	}
 
 	public Mono<Product> findByIdProduct(String id){
@@ -54,17 +72,59 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 				.retrieve()
 				.bodyToMono(Product.class);
 	}
-	
-	int cantidad=0;
+	public Product findByIdProduct2(String id){
+		logger.info("Class: CustomerProductServiceImpl -> Method: findByIdProduct ");
+		Product productResponse = restTemplate.getForObject("http://localhost:7072/api/1.0.0/products/"+id,Product.class);
+		return  productResponse;
+	}
 	@Override
-	public Mono<CustomerProduct> insert(CustomerProduct obj) {
-		logger.info("Class: CustomerProductServiceImpl -> Method: insert -> parameters:" + obj.toString());
-		obj.setRegisterDate(LocalDateTime.now());
+	public List<CustomerProduct> findByCustomerId(String customerId){
+		return repo2.findByCustomerId(customerId);
+	}
 
+	public CustomerProduct associateBankAccount(String accountBankAccount,String accountCreditCard) {
+		Mono<CustomerProduct> contractMono=this.findById(accountBankAccount).switchIfEmpty(Mono.error(() ->new BadRequestException("CUENTA NO ENCONTRADA ::: "+accountBankAccount)));
+		Mono<CustomerProduct> creditCardMono=this.findById(accountCreditCard).switchIfEmpty(Mono.error(()->new BadRequestException("CUENTA NO ENCONTRADA ::: "+accountCreditCard)));
+		CustomerProduct contract = null;
+		if (contract.getProduct().getName()!="DEBIT")
+		{
+			logger.info("CUENTA INCORRECTA. SE DEBE ASOCIAR UNA TARJETA DE DEBITO ::: "+contract.getProduct().getName());
+			//throw new RuntimeException("CUENTA INCORRECTA. SE DEBE ASOCIAR UNA TARJETA DE DEBITO ::: "+contract.getProduct().getName());
+			return  null;
+		}
+		contract.setProductId(contractMono.block().getProductId());
+		contract.setAmountAvailable(contractMono.block().getAmountAvailable());
+		contract.setCustomerId(contractMono.block().getCustomerId());
+		contract.setProductId(contractMono.block().getProductId());
+		contract.setCustomers(contractMono.block().getCustomers());
+		contract.setProduct(contractMono.block().getProduct());
+		contract.setRegisterDate(contractMono.block().getRegisterDate());
+		contract.setNumberOfMoves(contractMono.block().getNumberOfMoves());
+		contract.setCreditLine(contractMono.block().getCreditLine());
+		contract.setId(contractMono.block().getId());
+		contract.setMaxNumberTransactionsNoCommissions(contractMono.block().getMaxNumberTransactionsNoCommissions());
+		contract.setPaymentDate(contractMono.block().getPaymentDate());
+		contract.setAssociateDebitCard(accountCreditCard);
+		contract=repo2.save(contract);
+
+		return  contract;
+	}
+	@Override
+	public CustomerProduct insert(CustomerProduct obj) {
+		logger.info("Class: CustomerProductServiceImpl -> Method: insert -> parameters:" + obj.toString());
+		/*
 		return this.findByIdCustomer(obj.getCustomerId())
 				.switchIfEmpty(Mono.error(() -> new BadRequestException("El campo customerId tiene un valor no válido.")))
 				.flatMap(customer ->{
-						logger.info("cantidad: "+this.countCustomer(customer.getIdentificationDocument()));
+
+					this.countCustomer("12345678").filter(c->c.getCustomerType().getName().equals("PERSONAL"))
+							.collectList()
+							.map(c->{
+								cantidad=Integer.parseInt(String.valueOf(c.stream().count()));
+								logger.info("cantidad: "+cantidad);
+								return Mono.just( new RuntimeException("El campo customerId tiene un valor no válido."));
+							}).subscribe();
+
 					return this.findByIdProduct(obj.getProductId())
 							.switchIfEmpty(Mono.error(() -> new BadRequestException("El campo productId tiene un valor no válido.")))
 							.flatMap(product -> {
@@ -77,6 +137,54 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 							});
 				})
 				.doOnNext(c -> logger.info("SE INSERTÓ EL CONTRATO ::: " + c.getId()));
+		 */
+		try {
+			obj.setRegisterDate(LocalDateTime.now());
+			Customer client = this.findByIdCustomer2(obj.getCustomerId());
+			logger.info(client.toString());
+			Product product = this.findByIdProduct2(obj.getProductId());
+			logger.info(product.toString());
+			List<CustomerProduct> contract = this.findByCustomerId(obj.getCustomerId())
+					.stream()
+					.filter(c->c.getProduct().getId().equals(product.getId())).toList();
+			logger.info("Buscar cliente " + contract.toString());
+			CustomerProduct finalObj = obj;
+			List<CustomerProduct> existCredit= contract.stream().filter(c->c.getProduct().getProductType().getName().equals("CREDIT") && LocalDate.now().isAfter(c.getPaymentDate()) && c.getProductId().equals(finalObj.getProductId())).toList();
+			if (existCredit.stream().count()>0){
+				logger.info("CLIENTE TIENE UNA DEUDA DE ::: "+contract.get(0).getAmountAvailable());
+				//throw new RuntimeException("CLIENTE TIENE UNA DEUDA DE ::: "+contract.get(0).getAmountAvailable());
+				return  null;
+			}
+
+
+			if (contract.stream().count()>=1 && client.getCustomerType().getName().equals("PERSONAL") && ( product.getProductType().getName().equals("Bank account") || product.getProductType().getName().equals("CREDIT") )){
+				logger.info("CLIENTE YA POSEE UNA CUENTA DEL TIPO "+product.getName().toUpperCase()+" ::: POR SER " + client.getCustomerType().getName());
+				//throw new RuntimeException("cliente ya posee una cuenta"); CREDIT
+				return  null;
+			}else if (contract.stream().count()>=1 && client.getCustomerType().getName().equals("EMPRESARIAL") && product.getProductType().getName().equals("Bank account") && !( product.getName().equals("Cuenta corriente") ) ){
+				logger.info("CLIENTE YA POSEE NO PUEDO TENER CUENTA DEL TIPO "+product.getName().toUpperCase()+" ::: POR SER " + client.getCustomerType().getName());
+				//throw new RuntimeException("CLIENTE YA POSEE NO PUEDO TENER CUENTA DEL TIPO "+product.getName().toUpperCase()+" ::: POR SER " + client.getCustomerType().getName());
+				return  null;
+			}else if(product.getProductType().getName().equals("PERSONAL VIP") || product.getProductType().getName().equals("EMPRESARIAL PYME") ){
+				//proyecto 2  Bank account
+				List<CustomerProduct> contracts= this.findByCustomersIdAndProductId(obj.getCustomerId(),obj.getProductId()).stream().filter(cs->cs.getProduct().getProductType().getName().equals("Bank account")).toList();
+				if (contracts.stream().count()==0){
+					logger.info("CLIENTE DEBE POSEER UN CRÉDITO. => "+product.getName().toUpperCase()+" ::: " + client.getCustomerType().getName());
+					//throw new RuntimeException("CLIENTE DEBE POSEER UN CRÉDITO. => "+product.getName().toUpperCase()+" ::: " + client.getCustomerType().getName());
+					return  null;
+				}
+			}
+			obj.setCustomers(client);
+			obj.setProduct(product);
+			obj.setNumberOfMoves(BigDecimal.valueOf(0));
+			obj = repo2.save(obj);
+			logger.info("SE INSERTÓ EL CONTRATO ::: " + obj.getId());
+
+			return obj;
+		}catch (Exception e){
+			throw new BadRequestException("Error: "+e.getMessage());
+		}
+
 	}
 
 	@Override
@@ -104,8 +212,6 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 							});
 				})
 				.doOnNext(c -> logger.info("SE ACTUALIZÓ EL CONTRATO ::: " + c.getId()));
-
-
 	}
 
 	@Override
@@ -122,8 +228,6 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 										});
 							});
 				});
-
-
 	}
 
 	@Override
@@ -155,7 +259,9 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 	}
 
 	@Override
-	public Mono<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId) {
+	public List<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId) {
+		return  repo2.findByCustomersIdAndProductId(customersId, productId);
+		/*
 		return repo.findAll()
 				.map(c->{
 					logger.info("contratos: "+c.toString());
@@ -165,5 +271,7 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 				.switchIfEmpty(Mono.error(() -> new ModelNotFoundException("CONTRATO NO ENCONTRADO")))
 				.next()
 				.doOnNext(c -> logger.info("SE ENCONTRÓ EL CONTRATO DEL CLIENTE ::: " + customersId + " Y PRODUCTO ::: " + productId));
+
+		 */
 	}
 }

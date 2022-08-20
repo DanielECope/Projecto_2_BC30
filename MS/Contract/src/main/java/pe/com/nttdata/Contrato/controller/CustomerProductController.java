@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/1.0.0/contracts")
@@ -38,7 +39,7 @@ public class CustomerProductController {
 	}
 
 	@GetMapping("/findByCAndP")
-	public Mono<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId) {
+	public List<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId) {
 		logger.info("cliente: "+customersId);
 		logger.info("producto:"+productId);
 		return service.findByCustomersIdAndProductId(customersId,productId);
@@ -46,7 +47,7 @@ public class CustomerProductController {
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public Mono<CustomerProduct> insert(@Valid @RequestBody CustomerProduct obj){
+	public CustomerProduct insert(@Valid @RequestBody CustomerProduct obj){
 		return service.insert(obj);
 	}
 	

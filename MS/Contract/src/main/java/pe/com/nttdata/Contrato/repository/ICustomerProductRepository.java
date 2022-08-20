@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import pe.com.nttdata.Contrato.model.CustomerProduct;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface ICustomerProductRepository extends ReactiveMongoRepository<CustomerProduct, String> {
-    Mono<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId);
+    List<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId);
 }
