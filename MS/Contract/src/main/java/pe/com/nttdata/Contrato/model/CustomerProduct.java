@@ -12,6 +12,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -32,6 +33,11 @@ public class CustomerProduct {
 	private BigDecimal amountAvailable; // Monto disponible
 	private BigDecimal creditLine; // Monto de la linea de crédito (Tarjeta de crédito)
 	private LocalDateTime registerDate;
+	//proyecto 2
+	private int maxNumberTransactionsNoCommissions;
+	private BigDecimal numberOfMoves;
+	private LocalDate paymentDate;
+	private String associateDebitCard;
 
 	private Customer customers;
 	private Product product;
