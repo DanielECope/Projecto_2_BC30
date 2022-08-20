@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: discovery-server
+  
+  # Credenciales para acceder al config-server
+  cloud:
+    config:
+      uri: http://localhost:7075
+      username: root
+      password: s3cr3t0

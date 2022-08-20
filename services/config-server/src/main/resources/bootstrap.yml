@@ -1,0 +1,20 @@
+server:
+  port: 7075
+  
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/DanielECope/Projecto_2_BC30.git
+          searchPaths: config-data
+          #username: ingwmc
+          #password: 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
+          
+  # Credenciales para que se conecten al config-server
+  security:
+    user:
+      name: root
+      password: s3cr3t0
