@@ -38,6 +38,7 @@ public class CustomerProduct {
 	private BigDecimal numberOfMoves;
 	private LocalDate paymentDate;
 	private String associateDebitCard;
+	private String associatedBankAccount;
 
 	private Customer customers;
 	private Product product;

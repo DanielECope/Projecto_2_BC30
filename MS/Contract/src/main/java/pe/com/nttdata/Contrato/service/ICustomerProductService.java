@@ -9,5 +9,5 @@ public interface ICustomerProductService extends ICRUD<CustomerProduct, String> 
 	List<CustomerProduct> findByCustomersIdAndProductId(String customersId, String productId);
 	CustomerProduct insert(CustomerProduct obj);
 	List<CustomerProduct> findByCustomerId(String customerId);
-
+	CustomerProduct associateDebitCardAndBankAccount(String accountBankAccount,String accountDebitCard);
 }

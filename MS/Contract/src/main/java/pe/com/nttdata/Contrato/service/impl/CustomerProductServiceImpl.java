@@ -82,9 +82,10 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 		return repo2.findByCustomerId(customerId);
 	}
 
-	public CustomerProduct associateBankAccount(String accountBankAccount,String accountCreditCard) {
+	@Override
+	public CustomerProduct associateDebitCardAndBankAccount(String accountBankAccount,String accountDebitCard) {
 		Mono<CustomerProduct> contractMono=this.findById(accountBankAccount).switchIfEmpty(Mono.error(() ->new BadRequestException("CUENTA NO ENCONTRADA ::: "+accountBankAccount)));
-		Mono<CustomerProduct> creditCardMono=this.findById(accountCreditCard).switchIfEmpty(Mono.error(()->new BadRequestException("CUENTA NO ENCONTRADA ::: "+accountCreditCard)));
+		Mono<CustomerProduct> creditCardMono=this.findById(accountDebitCard).switchIfEmpty(Mono.error(()->new BadRequestException("CUENTA NO ENCONTRADA ::: "+accountDebitCard)));
 		CustomerProduct contract = null;
 		if (contract.getProduct().getName()!="DEBIT")
 		{
@@ -104,7 +105,7 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 		contract.setId(contractMono.block().getId());
 		contract.setMaxNumberTransactionsNoCommissions(contractMono.block().getMaxNumberTransactionsNoCommissions());
 		contract.setPaymentDate(contractMono.block().getPaymentDate());
-		contract.setAssociateDebitCard(accountCreditCard);
+		contract.setAssociateDebitCard(accountDebitCard);
 		contract=repo2.save(contract);
 
 		return  contract;
@@ -112,32 +113,6 @@ public class CustomerProductServiceImpl implements ICustomerProductService {
 	@Override
 	public CustomerProduct insert(CustomerProduct obj) {
 		logger.info("Class: CustomerProductServiceImpl -> Method: insert -> parameters:" + obj.toString());
-		/*
-		return this.findByIdCustomer(obj.getCustomerId())
-				.switchIfEmpty(Mono.error(() -> new BadRequestException("El campo customerId tiene un valor no válido.")))
-				.flatMap(customer ->{
-
-					this.countCustomer("12345678").filter(c->c.getCustomerType().getName().equals("PERSONAL"))
-							.collectList()
-							.map(c->{
-								cantidad=Integer.parseInt(String.valueOf(c.stream().count()));
-								logger.info("cantidad: "+cantidad);
-								return Mono.just( new RuntimeException("El campo customerId tiene un valor no válido."));
-							}).subscribe();
-
-					return this.findByIdProduct(obj.getProductId())
-							.switchIfEmpty(Mono.error(() -> new BadRequestException("El campo productId tiene un valor no válido.")))
-							.flatMap(product -> {
-								return repo.save(obj)
-										.map(contract -> {
-											contract.setCustomers(customer);
-											contract.setProduct(product);
-											return contract;
-										});
-							});
-				})
-				.doOnNext(c -> logger.info("SE INSERTÓ EL CONTRATO ::: " + c.getId()));
-		 */
 		try {
 			obj.setRegisterDate(LocalDateTime.now());
 			Customer client = this.findByIdCustomer2(obj.getCustomerId());
