@@ -5,5 +5,3 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/PurseDB
-# Para conectar con el Eureka Server (Sevice Discovery)
-
