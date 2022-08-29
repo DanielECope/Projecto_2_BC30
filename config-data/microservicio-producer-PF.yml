@@ -1,0 +1,5 @@
+server:
+  port: 7077
+
+# Para conectar con el Eureka Server (Sevice Discovery)
+
