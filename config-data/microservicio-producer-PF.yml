@@ -1,5 +1,8 @@
 server:
-  port: 7077
+  port: 7092
 
-# Para conectar con el Eureka Server (Sevice Discovery)
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/PurseDB
 
